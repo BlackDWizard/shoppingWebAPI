@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "DR34N/Aaz40OhxKCFV1lXlGV4+rXoIRVBhiKKglMtIbxPox7RC22QOxTQkJ6U1qeT+qaKxqNGjEgkFJYe1uSXw==",
+  "dgSpecHash": "k3Z+gQKlemH/qgnJz8ajSpvvXoRx/AmraVJMhLIjmVmz9GenIGmGgwZBZuUAinTw4ejU/xaw+8F6sSpqQNuwEg==",
   "success": true,
-  "projectFilePath": "D:\\SideProject\\Backend\\shoppingWebAPI\\ShoppingWebAPI\\ShoppingWebAPI\\ShoppingWebAPI.csproj",
+  "projectFilePath": "D:\\SideProject\\Backend\\shoppingWebAPI\\ShoppingWebAPI\\ShoppingWebAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Jonathan\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\Jonathan\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
