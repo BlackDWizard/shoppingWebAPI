@@ -1,6 +1,6 @@
-namespace ShoppingWebAPI
+namespace ShoppingWebAPI.Information
 {
-    public class WeatherForecast
+    public class WeatherForecastInfo
     {
         public DateOnly Date { get; set; }
 
