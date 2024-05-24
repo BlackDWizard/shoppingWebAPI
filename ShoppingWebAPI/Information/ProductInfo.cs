@@ -1,4 +1,4 @@
-using System.Data;
+Ôªøusing System.Data;
 using System.Text;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -117,9 +117,9 @@ namespace ShoppingWebAPI.Information
         #region Methods
 
         /// <summary>
-        /// ®Ãæ⁄PK∏¸§J§@µß∏ÍÆ∆
+        /// ‰æùÊìöPKËºâÂÖ•‰∏ÄÁ≠ÜË≥áÊñô
         /// </summary>
-        /// <returns>true•N™Ì¶®•\∏¸§J°Afalse•N™Ìß‰§£®Ï•Ù¶Û∏ÍÆ∆</returns>
+        /// <returns>true‰ª£Ë°®ÊàêÂäüËºâÂÖ•Ôºåfalse‰ª£Ë°®Êâæ‰∏çÂà∞‰ªª‰ΩïË≥áÊñô</returns>
         public bool Load(string iProductSN)
         {
             bool Result = false;
@@ -137,14 +137,14 @@ namespace ShoppingWebAPI.Information
 
                     sbCmd.Append("   SELECT * FROM [Product] WITH (Nolock) ");
                     sbCmd.Append("   WHERE(1 = 1) ");
-                    sbCmd.Append("       AND ProductSN = @ProductSN      ");
+                    sbCmd.Append("	   AND ProductSN = @ProductSN	  ");
 
                     command.Connection = connection;
                     command.CommandText = sbCmd.ToString();
 
                     #region Add In Parameter
 
-                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = _ProductSN;
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = this._ProductSN;
 
                     #endregion
 
@@ -188,8 +188,196 @@ namespace ShoppingWebAPI.Information
                 }
                 connection.Close();
             }
-
             return Result;
+        }
+
+
+        /// <summary>
+        /// Insert
+        /// </summary>
+        public void Insert()
+        {
+            using (SqlCommand command = new SqlCommand())
+            {
+                SqlConnection connection = new SqlConnection(_ConnectionString);
+                connection.Open();
+
+                try
+                {
+                    StringBuilder sbCmd = new StringBuilder();
+
+                    sbCmd.Append("	INSERT INTO [Product]		");
+                    sbCmd.Append("		(				");
+                    sbCmd.Append("		ProductSN		");
+                    sbCmd.Append("		,ProductName		");
+                    sbCmd.Append("		,ProductPrice		");
+                    sbCmd.Append("		,ProductDescription		");
+                    sbCmd.Append("		,Creator		");
+                    sbCmd.Append("		,CreatedDate		");
+                    sbCmd.Append("		,Modifier		");
+                    sbCmd.Append("		,ModifiedDate		");
+                    sbCmd.Append("		)				");
+                    sbCmd.Append("	VALUES		");
+                    sbCmd.Append("		(				");
+                    sbCmd.Append("		@ProductSN		");
+                    sbCmd.Append("		,@ProductName		");
+                    sbCmd.Append("		,@ProductPrice		");
+                    sbCmd.Append("		,@ProductDescription		");
+                    sbCmd.Append("		,@Creator		");
+                    sbCmd.Append("		,@CreatedDate		");
+                    sbCmd.Append("		,@Modifier		");
+                    sbCmd.Append("		,@ModifiedDate		");
+                    sbCmd.Append("		)				");
+
+                    command.Connection = connection;
+                    command.CommandText = sbCmd.ToString();
+
+                    #region Add In Parameter
+
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = this._ProductSN == null ? DBNull.Value : this._ProductSN;
+                    command.Parameters.Add("@ProductName", SqlDbType.NVarChar).Value = this._ProductName == null ? DBNull.Value : this._ProductName;
+                    command.Parameters.Add("@ProductPrice", SqlDbType.Int).Value = this._ProductPrice == null ? DBNull.Value : this._ProductPrice;
+                    command.Parameters.Add("@ProductDescription", SqlDbType.NVarChar).Value = this._ProductDescription == null ? DBNull.Value : this._ProductDescription;
+                    command.Parameters.Add("@Creator", SqlDbType.Char).Value = this._Creator == null ? DBNull.Value : this._Creator;
+                    command.Parameters.Add("@CreatedDate", SqlDbType.DateTime).Value = this._CreatedDate == null ? DBNull.Value : this._CreatedDate;
+                    command.Parameters.Add("@Modifier", SqlDbType.Char).Value = this._Modifier == null ? DBNull.Value : this._Modifier;
+                    command.Parameters.Add("@ModifiedDate", SqlDbType.DateTime).Value = this._ModifiedDate == null ? DBNull.Value : this._ModifiedDate;
+
+                    #endregion
+
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    StackTrace stack = new StackTrace();
+                    StackFrame frame = stack.GetFrame(0);
+                    string className = frame.GetMethod().DeclaringType.FullName;
+                    string methodName = frame.GetMethod().Name;
+
+                    ExceptionLogInfo exceptionLog = new ExceptionLogInfo(_ConnectionString);
+                    exceptionLog.ExceptionClass = className;
+                    exceptionLog.ExceptionMethod = methodName;
+                    exceptionLog.ExceptionReason = ex.ToString();
+                    exceptionLog.ExceptionDate = DateTime.Now;
+
+                    exceptionLog.Insert();
+                }
+                connection.Close();
+            }
+        }
+
+
+        /// <summary>
+        /// Update
+        /// </summary>
+        public void Update()
+        {
+            using (SqlCommand command = new SqlCommand())
+            {
+                SqlConnection connection = new SqlConnection(_ConnectionString);
+                connection.Open();
+
+                try
+                {
+                    StringBuilder sbCmd = new StringBuilder();
+
+                    sbCmd.Append("	UPDATE [Product] SET 		");
+                    sbCmd.Append("		ProductName = @ProductName 		");
+                    sbCmd.Append("		,ProductPrice = @ProductPrice 		");
+                    sbCmd.Append("		,ProductDescription = @ProductDescription 		");
+                    sbCmd.Append("		,Creator = @Creator 		");
+                    sbCmd.Append("		,CreatedDate = @CreatedDate 		");
+                    sbCmd.Append("		,Modifier = @Modifier 		");
+                    sbCmd.Append("		,ModifiedDate = @ModifiedDate 		");
+                    sbCmd.Append("	WHERE (1=1) ");
+                    sbCmd.Append("		AND ProductSN = @ProductSN 		");
+
+                    command.Connection = connection;
+                    command.CommandText = sbCmd.ToString();
+
+                    #region Add In Parameter
+
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = this._ProductSN;
+                    command.Parameters.Add("@ProductName", SqlDbType.NVarChar).Value = this._ProductName;
+                    command.Parameters.Add("@ProductPrice", SqlDbType.Int).Value = this._ProductPrice;
+                    command.Parameters.Add("@ProductDescription", SqlDbType.NVarChar).Value = this._ProductDescription;
+                    command.Parameters.Add("@Creator", SqlDbType.Char).Value = this._Creator;
+                    command.Parameters.Add("@CreatedDate", SqlDbType.DateTime).Value = this._CreatedDate;
+                    command.Parameters.Add("@Modifier", SqlDbType.Char).Value = this._Modifier;
+                    command.Parameters.Add("@ModifiedDate", SqlDbType.DateTime).Value = this._ModifiedDate;
+
+                    #endregion
+
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    StackTrace stack = new StackTrace();
+                    StackFrame frame = stack.GetFrame(0);
+                    string className = frame.GetMethod().DeclaringType.FullName;
+                    string methodName = frame.GetMethod().Name;
+
+                    ExceptionLogInfo exceptionLog = new ExceptionLogInfo(_ConnectionString);
+                    exceptionLog.ExceptionClass = className;
+                    exceptionLog.ExceptionMethod = methodName;
+                    exceptionLog.ExceptionReason = ex.ToString();
+                    exceptionLog.ExceptionDate = DateTime.Now;
+
+                    exceptionLog.Insert();
+                }
+                connection.Close();
+            }
+        }
+
+
+        /// <summary>
+        /// Delete
+        /// </summary>
+        public void Delete(string iProductSN)
+        {
+            this._ProductSN = iProductSN;
+
+            using (SqlCommand command = new SqlCommand())
+            {
+                SqlConnection connection = new SqlConnection(_ConnectionString);
+                connection.Open();
+
+                try
+                {
+                    StringBuilder sbCmd = new StringBuilder();
+
+                    sbCmd.Append("	DELETE [Product]		");
+                    sbCmd.Append("	WHERE (1=1) 		");
+                    sbCmd.Append("		AND ProductSN = @ProductSN 		");
+
+                    command.Connection = connection;
+                    command.CommandText = sbCmd.ToString();
+
+                    #region Add In Parameter
+
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = this._ProductSN;
+
+                    #endregion
+
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    StackTrace stack = new StackTrace();
+                    StackFrame frame = stack.GetFrame(0);
+                    string className = frame.GetMethod().DeclaringType.FullName;
+                    string methodName = frame.GetMethod().Name;
+
+                    ExceptionLogInfo exceptionLog = new ExceptionLogInfo(_ConnectionString);
+                    exceptionLog.ExceptionClass = className;
+                    exceptionLog.ExceptionMethod = methodName;
+                    exceptionLog.ExceptionReason = ex.ToString();
+                    exceptionLog.ExceptionDate = DateTime.Now;
+
+                    exceptionLog.Insert();
+                }
+                connection.Close();
+            }
         }
 
         #endregion

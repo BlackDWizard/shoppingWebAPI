@@ -5,12 +5,12 @@ using System.Diagnostics;
 
 namespace ShoppingWebAPI.Information
 {
-    public partial class ExceptionLogInfo
+    public partial class ProductImageInfo
     {
         /// <summary>
         /// Constructors
         /// </summary>		
-        public ExceptionLogInfo(string connString)
+        public ProductImageInfo(string connString)
         {
             this.Init();
             _ConnectionString = connString;
@@ -20,22 +20,24 @@ namespace ShoppingWebAPI.Information
         #region Init
         private void Init()
         {
-            this._ExceptionSN = 0;                                            //
-            this._ExceptionClass = "";                                        //
-            this._ExceptionMethod = "";                                       //
-            this._ExceptionReason = "";                                       //
-            this._ExceptionDate = null;                                       //
+            this._ProductSN = "";                                             //
+            this._ProductImage = null;                                        //
+            this._Creator = "";                                               //
+            this._CreatedDate = null;                                         //
+            this._Modifier = "";                                              //
+            this._ModifiedDate = null;                                        //
         }
         #endregion
 
 
         #region Private Properties
         private string _ConnectionString;
-        private int _ExceptionSN;
-        private string _ExceptionClass;
-        private string _ExceptionMethod;
-        private string _ExceptionReason;
-        private DateTime? _ExceptionDate;
+        private string _ProductSN;
+        private byte[] _ProductImage;
+        private string _Creator;
+        private DateTime? _CreatedDate;
+        private string _Modifier;
+        private DateTime? _ModifiedDate;
         #endregion
 
 
@@ -44,42 +46,50 @@ namespace ShoppingWebAPI.Information
         /// <summary>
         /// 
         /// </summary>
-        public int ExceptionSN
+        public string ProductSN
         {
-            get { return _ExceptionSN; }
-            set { _ExceptionSN = value; }
+            get { return _ProductSN; }
+            set { _ProductSN = value; }
         }
         /// <summary>
         /// 
         /// </summary>
-        public string ExceptionClass
+        public byte[] ProductImage
         {
-            get { return _ExceptionClass; }
-            set { _ExceptionClass = value; }
+            get { return _ProductImage; }
+            set { _ProductImage = value; }
         }
         /// <summary>
         /// 
         /// </summary>
-        public string ExceptionMethod
+        public string Creator
         {
-            get { return _ExceptionMethod; }
-            set { _ExceptionMethod = value; }
+            get { return _Creator; }
+            set { _Creator = value; }
         }
         /// <summary>
         /// 
         /// </summary>
-        public string ExceptionReason
+        public DateTime? CreatedDate
         {
-            get { return _ExceptionReason; }
-            set { _ExceptionReason = value; }
+            get { return _CreatedDate; }
+            set { _CreatedDate = value; }
         }
         /// <summary>
         /// 
         /// </summary>
-        public DateTime? ExceptionDate
+        public string Modifier
         {
-            get { return _ExceptionDate; }
-            set { _ExceptionDate = value; }
+            get { return _Modifier; }
+            set { _Modifier = value; }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public DateTime? ModifiedDate
+        {
+            get { return _ModifiedDate; }
+            set { _ModifiedDate = value; }
         }
         #endregion
 
@@ -90,11 +100,11 @@ namespace ShoppingWebAPI.Information
         /// 依據PK載入一筆資料
         /// </summary>
         /// <returns>true代表成功載入，false代表找不到任何資料</returns>
-        public bool Load(int iExceptionSN)
+        public bool Load(string iProductSN)
         {
             bool Result = false;
 
-            this._ExceptionSN = iExceptionSN;
+            this._ProductSN = iProductSN;
 
             using (SqlCommand command = new SqlCommand())
             {
@@ -105,16 +115,16 @@ namespace ShoppingWebAPI.Information
                 {
                     StringBuilder sbCmd = new StringBuilder();
 
-                    sbCmd.Append("   SELECT * FROM [ExceptionLog] WITH (Nolock) ");
+                    sbCmd.Append("   SELECT * FROM [ProductImage] WITH (Nolock) ");
                     sbCmd.Append("   WHERE(1 = 1) ");
-                    sbCmd.Append("	   AND ExceptionSN = @ExceptionSN	  ");
+                    sbCmd.Append("	   AND ProductSN = @ProductSN	  ");
 
                     command.Connection = connection;
                     command.CommandText = sbCmd.ToString();
 
                     #region Add In Parameter
 
-                    command.Parameters.Add("@ExceptionSN", SqlDbType.Int).Value = this._ExceptionSN;
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = this._ProductSN;
 
                     #endregion
 
@@ -131,11 +141,12 @@ namespace ShoppingWebAPI.Information
                         Result = true;
 
                         DataRow dr = dtTemp.Rows[0];
-                        this._ExceptionSN = Convert.ToInt32(dr["ExceptionSN"]);
-                        this._ExceptionClass = Convert.ToString(dr["ExceptionClass"]);
-                        this._ExceptionMethod = Convert.ToString(dr["ExceptionMethod"]);
-                        this._ExceptionReason = Convert.ToString(dr["ExceptionReason"]);
-                        this._ExceptionDate = dr["ExceptionDate"] == DBNull.Value ? new Nullable<DateTime>() : Convert.ToDateTime(dr["ExceptionDate"]);
+                        this._ProductSN = Convert.ToString(dr["ProductSN"]);
+                        this._ProductImage = (byte[])dr["ProductImage"];
+                        this._Creator = Convert.ToString(dr["Creator"]);
+                        this._CreatedDate = dr["CreatedDate"] == DBNull.Value ? new Nullable<DateTime>() : Convert.ToDateTime(dr["CreatedDate"]);
+                        this._Modifier = Convert.ToString(dr["Modifier"]);
+                        this._ModifiedDate = dr["ModifiedDate"] == DBNull.Value ? new Nullable<DateTime>() : Convert.ToDateTime(dr["ModifiedDate"]);
                     }
                 }
                 catch (Exception ex)
@@ -173,19 +184,23 @@ namespace ShoppingWebAPI.Information
                 {
                     StringBuilder sbCmd = new StringBuilder();
 
-                    sbCmd.Append("	INSERT INTO [ExceptionLog]		");
+                    sbCmd.Append("	INSERT INTO [ProductImage]		");
                     sbCmd.Append("		(				");
-                    sbCmd.Append("		ExceptionClass		");
-                    sbCmd.Append("		,ExceptionMethod		");
-                    sbCmd.Append("		,ExceptionReason		");
-                    sbCmd.Append("		,ExceptionDate		");
+                    sbCmd.Append("		ProductSN		");
+                    sbCmd.Append("		,ProductImage		");
+                    sbCmd.Append("		,Creator		");
+                    sbCmd.Append("		,CreatedDate		");
+                    sbCmd.Append("		,Modifier		");
+                    sbCmd.Append("		,ModifiedDate		");
                     sbCmd.Append("		)				");
                     sbCmd.Append("	VALUES		");
                     sbCmd.Append("		(				");
-                    sbCmd.Append("		@ExceptionClass		");
-                    sbCmd.Append("		,@ExceptionMethod		");
-                    sbCmd.Append("		,@ExceptionReason		");
-                    sbCmd.Append("		,@ExceptionDate		");
+                    sbCmd.Append("		@ProductSN		");
+                    sbCmd.Append("		,@ProductImage		");
+                    sbCmd.Append("		,@Creator		");
+                    sbCmd.Append("		,@CreatedDate		");
+                    sbCmd.Append("		,@Modifier		");
+                    sbCmd.Append("		,@ModifiedDate		");
                     sbCmd.Append("		)				");
 
                     command.Connection = connection;
@@ -193,10 +208,12 @@ namespace ShoppingWebAPI.Information
 
                     #region Add In Parameter
 
-                    command.Parameters.Add("@ExceptionClass", SqlDbType.VarChar).Value = this._ExceptionClass == null ? DBNull.Value : this._ExceptionClass;
-                    command.Parameters.Add("@ExceptionMethod", SqlDbType.VarChar).Value = this._ExceptionMethod == null ? DBNull.Value : this._ExceptionMethod;
-                    command.Parameters.Add("@ExceptionReason", SqlDbType.NVarChar).Value = this._ExceptionReason == null ? DBNull.Value : this._ExceptionReason;
-                    command.Parameters.Add("@ExceptionDate", SqlDbType.DateTime).Value = this._ExceptionDate == null ? DBNull.Value : this._ExceptionDate;
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = this._ProductSN == null ? DBNull.Value : this._ProductSN;
+                    command.Parameters.Add("@ProductImage", SqlDbType.VarBinary).Value = this._ProductImage == null ? DBNull.Value : this._ProductImage;
+                    command.Parameters.Add("@Creator", SqlDbType.Char).Value = this._Creator == null ? DBNull.Value : this._Creator;
+                    command.Parameters.Add("@CreatedDate", SqlDbType.DateTime).Value = this._CreatedDate == null ? DBNull.Value : this._CreatedDate;
+                    command.Parameters.Add("@Modifier", SqlDbType.Char).Value = this._Modifier == null ? DBNull.Value : this._Modifier;
+                    command.Parameters.Add("@ModifiedDate", SqlDbType.DateTime).Value = this._ModifiedDate == null ? DBNull.Value : this._ModifiedDate;
 
                     #endregion
 
@@ -236,24 +253,26 @@ namespace ShoppingWebAPI.Information
                 {
                     StringBuilder sbCmd = new StringBuilder();
 
-                    sbCmd.Append("	UPDATE [ExceptionLog] SET 		");
-                    sbCmd.Append("		ExceptionClass = @ExceptionClass 		");
-                    sbCmd.Append("		,ExceptionMethod = @ExceptionMethod 		");
-                    sbCmd.Append("		,ExceptionReason = @ExceptionReason 		");
-                    sbCmd.Append("		,ExceptionDate = @ExceptionDate 		");
+                    sbCmd.Append("	UPDATE [ProductImage] SET 		");
+                    sbCmd.Append("		ProductImage = @ProductImage 		");
+                    sbCmd.Append("		,Creator = @Creator 		");
+                    sbCmd.Append("		,CreatedDate = @CreatedDate 		");
+                    sbCmd.Append("		,Modifier = @Modifier 		");
+                    sbCmd.Append("		,ModifiedDate = @ModifiedDate 		");
                     sbCmd.Append("	WHERE (1=1) ");
-                    sbCmd.Append("		AND ExceptionSN = @ExceptionSN 		");
+                    sbCmd.Append("		AND ProductSN = @ProductSN 		");
 
                     command.Connection = connection;
                     command.CommandText = sbCmd.ToString();
 
                     #region Add In Parameter
 
-                    command.Parameters.Add("@ExceptionSN", SqlDbType.Int).Value = this._ExceptionSN;
-                    command.Parameters.Add("@ExceptionClass", SqlDbType.VarChar).Value = this._ExceptionClass;
-                    command.Parameters.Add("@ExceptionMethod", SqlDbType.VarChar).Value = this._ExceptionMethod;
-                    command.Parameters.Add("@ExceptionReason", SqlDbType.NVarChar).Value = this._ExceptionReason;
-                    command.Parameters.Add("@ExceptionDate", SqlDbType.DateTime).Value = this._ExceptionDate;
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = this._ProductSN;
+                    command.Parameters.Add("@ProductImage", SqlDbType.VarBinary).Value = this._ProductImage;
+                    command.Parameters.Add("@Creator", SqlDbType.Char).Value = this._Creator;
+                    command.Parameters.Add("@CreatedDate", SqlDbType.DateTime).Value = this._CreatedDate;
+                    command.Parameters.Add("@Modifier", SqlDbType.Char).Value = this._Modifier;
+                    command.Parameters.Add("@ModifiedDate", SqlDbType.DateTime).Value = this._ModifiedDate;
 
                     #endregion
 
@@ -282,9 +301,9 @@ namespace ShoppingWebAPI.Information
         /// <summary>
         /// Delete
         /// </summary>
-        public void Delete(int iExceptionSN)
+        public void Delete(string iProductSN)
         {
-            this._ExceptionSN = iExceptionSN;
+            this._ProductSN = iProductSN;
 
             using (SqlCommand command = new SqlCommand())
             {
@@ -295,16 +314,16 @@ namespace ShoppingWebAPI.Information
                 {
                     StringBuilder sbCmd = new StringBuilder();
 
-                    sbCmd.Append("	DELETE [ExceptionLog]		");
+                    sbCmd.Append("	DELETE [ProductImage]		");
                     sbCmd.Append("	WHERE (1=1) 		");
-                    sbCmd.Append("		AND ExceptionSN = @ExceptionSN 		");
+                    sbCmd.Append("		AND ProductSN = @ProductSN 		");
 
                     command.Connection = connection;
                     command.CommandText = sbCmd.ToString();
 
                     #region Add In Parameter
 
-                    command.Parameters.Add("@ExceptionSN", SqlDbType.Int).Value = this._ExceptionSN;
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = this._ProductSN;
 
                     #endregion
 
@@ -336,12 +355,13 @@ namespace ShoppingWebAPI.Information
 
 #region Use Sample
 /*
-Vista.Information.ExceptionLogInfo Info = new Vista.Information.ExceptionLogInfo();
-Info.ExceptionSN = 0;                                  //
-Info.ExceptionClass = "";                              //
-Info.ExceptionMethod = "";                             //
-Info.ExceptionReason = "";                             //
-Info.ExceptionDate = null;                             //
+Vista.Information.ProductImageInfo Info = new Vista.Information.ProductImageInfo();
+Info.ProductSN = "";                                   //
+Info.ProductImage = null;                              //
+Info.Creator = "";                                     //
+Info.CreatedDate = null;                               //
+Info.Modifier = "";                                    //
+Info.ModifiedDate = null;                              //
 */
 #endregion
 
