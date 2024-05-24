@@ -1,27 +1,19 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Text;
-using System.Xml;
-using System.Configuration;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using System.Buffers.Text;
-using Newtonsoft.Json.Linq;
 using System.Data.SqlClient;
+using System.Diagnostics;
 
 namespace ShoppingWebAPI.Information
 {
     public partial class ProductInfo
     {
-
         /// <summary>
         /// Constructors
         /// </summary>		
-        public ProductInfo()
+        public ProductInfo(string connString)
         {
             this.Init();
-            this.GetConnection();
+            _ConnectionString = connString;
         }
 
 
@@ -36,16 +28,6 @@ namespace ShoppingWebAPI.Information
             this._CreatedDate = null;                                         //
             this._Modifier = "";                                              //
             this._ModifiedDate = null;                                        //
-        }
-        #endregion
-
-        #region GetConnection
-        private void GetConnection()
-        {
-            string filePath = "ConnectionConfig.json";
-            string jsonContent = File.ReadAllText(filePath);
-            JObject jsonObject = JObject.Parse(jsonContent);
-            _ConnectionString = jsonObject["ConnectionString"].ToString();
         }
         #endregion
 
@@ -156,20 +138,21 @@ namespace ShoppingWebAPI.Information
                     sbCmd.Append("   SELECT * FROM [Product] WITH (Nolock) ");
                     sbCmd.Append("   WHERE(1 = 1) ");
                     sbCmd.Append("       AND ProductSN = @ProductSN      ");
+
                     command.Connection = connection;
                     command.CommandText = sbCmd.ToString();
 
                     #region Add In Parameter
 
-                    SqlParameter param = command.Parameters.Add("@ProductSN", SqlDbType.Char);
-                    param.Value = _ProductSN;
+                    command.Parameters.Add("@ProductSN", SqlDbType.Char).Value = _ProductSN;
 
                     #endregion
-                    IDataReader dataReader = command.ExecuteReader();
-                    DataTable dt = new DataTable();
-                    dt.Load(dataReader);
 
-                    if (dt.Rows.Count == 0)
+                    IDataReader dataReader = command.ExecuteReader();
+                    DataTable dtTemp = new DataTable();
+                    dtTemp.Load(dataReader);
+
+                    if (dtTemp.Rows.Count == 0)
                     {
                         Result = false;
                     }
@@ -177,7 +160,7 @@ namespace ShoppingWebAPI.Information
                     {
                         Result = true;
 
-                        DataRow dr = dt.Rows[0];
+                        DataRow dr = dtTemp.Rows[0];
                         this._ProductSN = Convert.ToString(dr["ProductSN"]);
                         this._ProductName = Convert.ToString(dr["ProductName"]);
                         this._ProductPrice = Convert.ToInt32(dr["ProductPrice"]);
@@ -190,14 +173,18 @@ namespace ShoppingWebAPI.Information
                 }
                 catch (Exception ex)
                 {
-                    StringBuilder sbCmd = new StringBuilder();
+                    StackTrace stack = new StackTrace();
+                    StackFrame frame = stack.GetFrame(0);
+                    string className = frame.GetMethod().DeclaringType.FullName;
+                    string methodName = frame.GetMethod().Name;
 
-                    sbCmd.Append("   Insert into * FROM [Product] WITH (Nolock) ");
-                    sbCmd.Append("   WHERE(1 = 1) ");
-                    sbCmd.Append("       AND ProductSN = @ProductSN      ");
-                    command.Connection = connection;
-                    command.CommandText = sbCmd.ToString();
+                    ExceptionLogInfo exceptionLog = new ExceptionLogInfo(_ConnectionString);
+                    exceptionLog.ExceptionClass = className;
+                    exceptionLog.ExceptionMethod = methodName;
+                    exceptionLog.ExceptionReason = ex.ToString();
+                    exceptionLog.ExceptionDate = DateTime.Now;
 
+                    exceptionLog.Insert();
                 }
                 connection.Close();
             }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using ShoppingWebAPI.Information;
 
 namespace ShoppingWebAPI.Controllers
@@ -7,28 +8,24 @@ namespace ShoppingWebAPI.Controllers
     [Route("[controller]")]
     public class ProductController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
+        private readonly IConfiguration _configuration;
         private readonly ILogger<ProductController> _logger;
+        private readonly string _connectionString;
 
-        public ProductController(ILogger<ProductController> logger)
+        public ProductController(ILogger<ProductController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
+            _connectionString = ConfigurationExtensions.GetConnectionString(_configuration, "ShoppingWeb");
         }
 
         [HttpGet(Name = "GetProduct")]
-        public IEnumerable<WeatherForecastInfo> Get()
+        public ProductInfo Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecastInfo
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            ProductInfo productInfo = new ProductInfo(_connectionString);
+            productInfo.Load("0000000001");
+
+            return productInfo;
         }
     }
 }
