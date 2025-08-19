@@ -5,10 +5,14 @@ EXPOSE $PORT
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY . .  
-WORKDIR /src/ShoppingWebAPI
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
+
+# build context 已經是專案資料夾了，直接 COPY .
+COPY . .
+WORKDIR /src
+
+# restore / publish
+RUN dotnet restore ShoppingWebAPI.csproj
+RUN dotnet publish ShoppingWebAPI.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
